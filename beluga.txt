@@ -1,14 +1,14 @@
--- ts file was generated at discord.gg/25ms
 
 
-_G.tidolbaeb = "ti dymal esly ispolsiesh _G to naidesh choto tak vot ti nashel"
+
+_G.tidolbaeb = "fuckyou"
 print("Credits to Sten for the original source")
-print("by : (slade_yt) discord")
-print("Server discord (https://discord.gg/HjNaYs6AnV) - copied")
+print("by : (beluga1001) discord")
+print("Server discord (https://discord.gg/GUusfysPFs) - copied")
 print("RightControl open or close gui")
 print("if you find a bug, write to me (my discord) ")
 print("Fixed Solara Updated 2.3 (Version)")
-setclipboard("https://discord.gg/HjNaYs6AnV")
+setclipboard("https://discord.gg/GUusfysPFs")
 local vu1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/max2007killer/auto-build-v2-source-/main/listing.txt"))()
 local vu2 = {
     main_color = Color3.fromRGB(41, 74, 122),
