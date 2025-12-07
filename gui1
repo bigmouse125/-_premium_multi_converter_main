@@ -1,10 +1,13 @@
+-- man fuck you if your reading this
 
 
-_G.tidolbaeb = "fuck you if your reading this"
+_G.tidolbaeb = "ti dymal esly ispolsiesh _G to naidesh choto tak vot ti nashel"
+print("Credits to Sten for the original source")
 print("by : (beluga1001) discord")
 print("Server discord (https://discord.gg/belugafiles) - copied")
 print("RightControl open or close gui")
 print("if you find a bug, write to me (my discord) ")
+print("Fixed Solara Updated 2.3 (Version)")
 setclipboard("https://discord.gg/belugafiles")
 local vu1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/max2007killer/auto-build-v2-source-/main/listing.txt"))()
 local vu2 = {
@@ -2948,7 +2951,7 @@ function AutoFarm(p786)
         end
     end
 end
-local v789 = v120:AddWindow("Converter", {
+local v789 = v120:AddWindow("Auto Builder", {
     main_color = vu453(41, 74, 122),
     min_size = Vector2.new(300, 450),
     toggle_key = Enum.KeyCode.RightControl,
@@ -3143,7 +3146,7 @@ end, {
 })
 v843:AddButton("Mirror Build", MirrorBuild)
 v843:Fold(true)
-local v845 = v789:AddTab("Other"):AddFolder("export/import")
+local v845 = v789:AddTab("Other"):AddFolder("Auto Farm")
 v845:AddSwitch("Enabled", AutoFarm)
 v845:Fold(true)
 local v846 = v789:AddTab("Info")
