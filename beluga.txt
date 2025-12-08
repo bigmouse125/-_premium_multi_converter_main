@@ -1,7 +1,7 @@
 
 
 
-_G.tidolbaeb = "fuckyou"
+_G.tidolbaeb = "ifyouarereadingthisfuckyouskid"
 print("Credits to Sten for the original source")
 print("by : (beluga1001) discord")
 print("Server discord (https://discord.gg/GUusfysPFs) - copied")
