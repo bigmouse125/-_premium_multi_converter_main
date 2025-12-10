@@ -2961,7 +2961,7 @@ local v790 = v789:AddTab("Main")
 local vu791 = nil
 local vu792 = 1
 local vu794 = v790:AddDropdown("Files", function(p793)
-    vu791 = p793 .. ".Build"
+    vu791 = p793 .. ".Build", ".obj", ".json", ".build"
 end)
 local function vu799()
     vu794:Clear()
