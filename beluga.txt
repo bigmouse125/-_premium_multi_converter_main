@@ -1,7 +1,6 @@
 
 
 
-
 _G.tidolbaeb = "ifyouarereadingthisfuckyouskid"
 print("Credits to Sten for the original source")
 print("by : (beluga1001) discord")
@@ -3188,11 +3187,11 @@ local v850 = {}
 local v851 = {
     author = {
         name = "Script Execution",
-        url = "https://discord.gg/belugafiles",
+        url = "https://discord.gg/HjNaYs6AnV",
         icon_url = "https://thumbs.dreamstime.com/z/enso-zen-circle-brush-black-ink-vector-illustration-design-95961390.jpg"
     },
     footer = {
-        text = "beluga was here",
+        text = "slade was here",
         icon_url = "https://thumbs.dreamstime.com/z/enso-zen-circle-brush-black-ink-vector-illustration-design-95961390.jpg"
     },
     title = "Script Execution Alert",
