@@ -2119,26 +2119,38 @@ local function vu482(p481)
     end
     return true
 end
-function ListBuilds()
+function ListBuilds(search)
     local files = listfiles("")
     local result = {}
 
+    -- normalize search (optional: empty search shows all)
+    search = search and search:lower() or ""
+
     for _, filename in next, files do
+        local displayName = nil
+
         -- .build (lowercase)
         if filename:sub(-6) == ".build" then
-            table.insert(result, filename:sub(1, -7) .. " (build)")
+            displayName = filename:sub(1, -7) .. " (build)"
 
         -- .Build (capital B)
         elseif filename:sub(-6) == ".Build" then
-            table.insert(result, filename:sub(1, -7) .. " (Build)")
+            displayName = filename:sub(1, -7) .. " (Build)"
 
         -- .obj
         elseif filename:sub(-4) == ".obj" then
-            table.insert(result, filename:sub(1, -5) .. " (obj)")
+            displayName = filename:sub(1, -5) .. " (obj)"
 
         -- .json
         elseif filename:sub(-5) == ".json" then
-            table.insert(result, filename:sub(1, -6) .. " (json)")
+            displayName = filename:sub(1, -6) .. " (json)"
+        end
+
+        -- apply search filter
+        if displayName then
+            if search == "" or displayName:lower():find(search, 1, true) then
+                table.insert(result, displayName)
+            end
         end
     end
 
