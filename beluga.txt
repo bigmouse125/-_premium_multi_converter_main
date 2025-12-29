@@ -2143,8 +2143,7 @@ function ListBuilds()
             name = string.sub(v487, 0, #v487 - 5)
             format = "json"
         end
-
-        if name then
+       if name then
             -- Store name with format in parentheses
             vu464(v486, name .. " (" .. format .. ")")
         end
