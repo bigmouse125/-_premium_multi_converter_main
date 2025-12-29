@@ -2130,8 +2130,6 @@ function ListBuilds()
         if v485 == nil then
             break
         end
-
-        local name, format
         if string.sub(v487, #v487 - 5, #v487) == ".Build" then
             name = string.sub(v487, 0, #v487 - 6)
             format = "Build"
@@ -2151,7 +2149,6 @@ function ListBuilds()
             vu464(v486, name .. " (" .. format .. ")")
         end
     end
-
     return v486
 end
 local vu488 = 16777216
