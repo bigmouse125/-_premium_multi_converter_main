@@ -2119,30 +2119,41 @@ local function vu482(p481)
     end
     return true
 end
-function ListBuilds()
-    local files = listfiles("")
-    local result = {}
+local function ListBuilds()
+    local v483 = listfiles("")  -- list all files
+    local v484 = next
+    local v485 = nil
+    local v486 = {}  -- table to store build names
 
-    for _, filename in next, files do
-        -- .build (lowercase)
-        if filename:sub(-6) == ".build" then
-            table.insert(result, filename:sub(1, -7) .. " (build)")
+    while true do
+        local v487
+        v485, v487 = v484(v483, v485)
+        if v485 == nil then
+            break
+        end
 
-        -- .Build (capital B)
-        elseif filename:sub(-6) == ".Build" then
-            table.insert(result, filename:sub(1, -7) .. " (Build)")
+        local name, format
+        if string.sub(v487, #v487 - 5, #v487) == ".Build" then
+            name = string.sub(v487, 0, #v487 - 6)
+            format = "Build"
+        elseif string.sub(v487, #v487 - 5, #v487) == ".build" then
+            name = string.sub(v487, 0, #v487 - 6)
+            format = "build"
+        elseif string.sub(v487, #v487 - 3, #v487) == ".obj" then
+            name = string.sub(v487, 0, #v487 - 4)
+            format = "obj"
+        elseif string.sub(v487, #v487 - 4, #v487) == ".json" then
+            name = string.sub(v487, 0, #v487 - 5)
+            format = "json"
+        end
 
-        -- .obj
-        elseif filename:sub(-4) == ".obj" then
-            table.insert(result, filename:sub(1, -5) .. " (obj)")
-
-        -- .json
-        elseif filename:sub(-5) == ".json" then
-            table.insert(result, filename:sub(1, -6) .. " (json)")
+        if name then
+            -- Store name with format in parentheses
+            vu464(v486, name .. " (" .. format .. ")")
         end
     end
 
-    return result
+    return v486
 end
 local vu488 = 16777216
 local vu489 = 65536
