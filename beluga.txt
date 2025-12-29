@@ -2119,75 +2119,43 @@ local function vu482(p481)
     end
     return true
 end
-function ListBuildsWithSearch(parent)
-    -- parent: Frame or Container to attach GUI to
+function ListBuilds(search)
+    local files = listfiles("")
+    local result = {}
 
-    -- Container frame
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 300, 0, 400)
-    frame.Position = UDim2.new(0.5, -150, 0.5, -200)
-    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    frame.Parent = parent
+    -- normalize search
+    search = (type(search) == "string" and search ~= "") and search:lower() or nil
 
-    -- Search TextBox
-    local searchBox = Instance.new("TextBox")
-    searchBox.Size = UDim2.new(1, -10, 0, 30)
-    searchBox.Position = UDim2.new(0, 5, 0, 5)
-    searchBox.PlaceholderText = "Search builds..."
-    searchBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    searchBox.ClearTextOnFocus = false
-    searchBox.Parent = frame
+    for _, filename in next, files do
+        local name, format
 
-    -- List ScrollingFrame
-    local list = Instance.new("ScrollingFrame")
-    list.Size = UDim2.new(1, -10, 1, -45)
-    list.Position = UDim2.new(0, 5, 0, 40)
-    list.CanvasSize = UDim2.new()
-    list.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    list.Parent = frame
+        if filename:sub(-6) == ".build" then
+            name = filename:sub(1, -7)
+            format = "build"
 
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 5)
-    layout.Parent = list
+        elseif filename:sub(-6) == ".Build" then
+            name = filename:sub(1, -7)
+            format = "Build"
 
-    -- Function to refresh build list
-    local function refresh(searchText)
-        for _, child in ipairs(list:GetChildren()) do
-            if child:IsA("TextButton") then
-                child:Destroy()
-            end
+        elseif filename:sub(-4) == ".obj" then
+            name = filename:sub(1, -5)
+            format = "obj"
+
+        elseif filename:sub(-5) == ".json" then
+            name = filename:sub(1, -6)
+            format = "json"
         end
 
-        searchText = (type(searchText) == "string" and searchText ~= "") and searchText:lower() or nil
-        local files = listfiles("")
-
-        for _, filename in ipairs(files) do
-            local name, format
-            if filename:sub(-6) == ".build" then
-                name = filename:sub(1, -7)
-                format = "build"
-            elseif filename:sub(-6) == ".Build" then
-                name = filename:sub(1, -7)
-                format = "Build"
-            elseif filename:sub(-4) == ".obj" then
-                name = filename:sub(1, -5)
-                format = "obj"
-            elseif filename:sub(-5) == ".json" then
-                name = filename:sub(1, -6)
-                format = "json"
-            end
-
-            if name and (not searchText or name:lower():find(searchText, 1, true)) then
-                local btn = Instance.new("TextButton")
-                btn.Size = UDim2.new(1, -5, 0, 30)
-                btn.Text = name .. " (" .. format .. ")"
-                btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                btn.Parent = list
+        -- search filter (ONLY on filename)
+        if name then
+            if not search or name:lower():find(search, 1, true) then
+                table.insert(result, name .. " (" .. format .. ")")
             end
         end
+    end
 
+    return result
+end
         task.wait()
         list.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 5)
     end
