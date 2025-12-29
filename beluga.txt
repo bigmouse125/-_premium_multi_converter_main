@@ -2130,7 +2130,7 @@ function ListBuilds()
         if v485 == nil then
             break
         end
-        if string.sub(v487, # v487 - 5, # v487) == ".Build" then
+        if string.sub(v487, # v487 - 5, # v487) == ".Build", ".Json", ".obj", ".build",  then
             vu464(v486, string.sub(v487, 0, # v487 - 6))
         end
     end
