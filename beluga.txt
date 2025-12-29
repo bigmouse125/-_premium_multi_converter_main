@@ -2676,71 +2676,85 @@ end
 function PreviewFile(p672, p673, p674)
     local v675 = Convert(p672) or readfile(p672)
     local v676 = Decode(v675, p673)
+    
     local v677 = p674 and vu445[p674] or GetPlot()
+    if not v677 then return end
+
+    -- Internal helper to convert "1, 2, 3" strings to Vector3 safely
+    local function SafeVector(input)
+        if type(input) == "userdata" then return input end -- Already a Vector3
+        if type(input) ~= "string" then return Vector3.new(0,0,0) end
+        
+        local parts = {}
+        for num in input:gmatch("([^,]+)") do
+            table.insert(parts, tonumber(num) or 0)
+        end
+        return Vector3.new(parts[1] or 0, parts[2] or 0, parts[3] or 0)
+    end
 
     local function CreateGhost(blockName, blockData)
         local template = vu444[blockName]
         if not template then return end
 
         local ghost = vu473(template)
+        if not ghost then return end
         
-        -- Safe Position Handling
-        local pos = Vector3.new(0, 0, 0)
-        if blockData.Position then
-            pos = type(blockData.Position) == "string" and vu454(Raw(blockData.Position)) or blockData.Position
-        end
+        -- Use SafeVector fallback if the global vu454/Raw fails
+        local pos = SafeVector(blockData.Position)
         
-        -- Safe Rotation Handling (Fixes the 'index nil with Y' error)
         local rot = CFrame.new()
         if blockData.Rotation then
-            -- Wrap in pcall to prevent the 'Y' index error from crashing the script
-            local success, result = pcall(function()
-                return type(blockData.Rotation) == "string" and AnglesString(blockData.Rotation) or blockData.Rotation
+            pcall(function()
+                -- Try your script's native function first, then fallback
+                rot = type(blockData.Rotation) == "string" and AnglesString(blockData.Rotation) or blockData.Rotation
             end)
-            if success and result then
-                rot = result
-            end
         end
         
-        -- Apply the CFrame
-        vu468(ghost, v677.CFrame * pos * rot)
+        -- Use a pcall for the CFrame multiplication to catch "nil" errors
+        local success, targetCF = pcall(function()
+            return v677.CFrame * pos * rot
+        end)
+
+        if success and targetCF then
+            vu468(ghost, targetCF)
+        else
+            ghost:Destroy()
+            return
+        end
         
         ghost.Health.Value = ""
         ghost.Parent = vu446
         
         local pPart = ghost:FindFirstChild("PPart")
         if pPart then
-            -- Safe Size Handling
-            if blockData.Size then
-                local sz = type(blockData.Size) == "string" and vu454(Raw(blockData.Size)) or blockData.Size
-                pPart.Size = sz or pPart.Size
-            end
-            
+            pPart.Size = SafeVector(blockData.Size) or pPart.Size
             pPart.Anchored = true
             pPart.CanCollide = false
             
-            -- Apply Color
             if blockData.Color then
-                local col = type(blockData.Color) == "string" and vu452(Raw(blockData.Color)) or blockData.Color
+                local col = SafeVector(blockData.Color)
                 for _, part in pairs(ghost:GetDescendants()) do
                     if part:IsA("BasePart") then
-                        part.Color = col
+                        -- Convert 0-1 color values to Color3
+                        part.Color = Color3.new(col.X, col.Y, col.Z)
                     end
                 end
             end
         end
     end
 
-    -- Logic to handle the specific nested format
+    -- Process the [ [names], {data} ] format
     local actualData = v676
-    if v676[1] and type(v676[1]) == "table" and v676[2] and type(v676[2]) == "table" then
+    if type(v676) == "table" and v676[1] and v676[2] then
         actualData = v676[2]
     end
 
-    for blockName, blockInstances in pairs(actualData) do
-        if type(blockName) == "string" and type(blockInstances) == "table" then
-            for _, data in ipairs(blockInstances) do
-                CreateGhost(blockName, data)
+    if type(actualData) == "table" then
+        for blockName, blockInstances in pairs(actualData) do
+            if type(blockName) == "string" and type(blockInstances) == "table" then
+                for _, data in ipairs(blockInstances) do
+                    CreateGhost(blockName, data)
+                end
             end
         end
     end
