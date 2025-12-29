@@ -2723,6 +2723,7 @@ function PreviewFile(p672, p673, p674)
             end
         end
     end
+
     -- 4. THE COMPATIBILITY SOLVER
     -- This looks at the data structure you provided: [ ["Names"], {DataDict} ]
     local actualData = v676
@@ -2739,19 +2740,6 @@ function PreviewFile(p672, p673, p674)
             for _, data in ipairs(blockInstances) do
                 CreateGhost(blockName, data)
             end
-        end
-    end
-end    -- 3. Logic to handle DIFFERENT LAYOUTS
-    for key, value in pairs(v676) do
-        if type(key) == "string" and type(value) == "table" then
-            -- FORMAT A: Organized by Block Name (Your current script)
-            for _, blockData in pairs(value) do
-                CreateGhost(key, blockData)
-            end
-        elseif type(value) == "table" and value.Name then
-            -- FORMAT B: Flat List (Common in other scripts)
-            -- Each entry is {Name = "Stone", Position = ...}
-            CreateGhost(value.Name, value)
         end
     end
 end
