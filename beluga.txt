@@ -2119,12 +2119,11 @@ local function vu482(p481)
     end
     return true
 end
-local function ListBuilds()
-    local v483 = listfiles("")  -- list all files
+function ListBuilds()
+    local v483 = listfiles("")
     local v484 = next
     local v485 = nil
-    local v486 = {}  -- table to store build names
-
+    local v486 = {}
     while true do
         local v487
         v485, v487 = v484(v483, v485)
