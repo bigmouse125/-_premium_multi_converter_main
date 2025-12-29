@@ -2123,50 +2123,38 @@ function ListBuilds(search)
     local files = listfiles("")
     local result = {}
 
-    -- normalize search
-    search = (type(search) == "string" and search ~= "") and search:lower() or nil
+    -- normalize search (optional: empty search shows all)
+    search = search and search:lower() or ""
 
     for _, filename in next, files do
-        local name, format
+        local displayName = nil
 
+        -- .build (lowercase)
         if filename:sub(-6) == ".build" then
-            name = filename:sub(1, -7)
-            format = "build"
+            displayName = filename:sub(1, -7) .. " (build)"
 
+        -- .Build (capital B)
         elseif filename:sub(-6) == ".Build" then
-            name = filename:sub(1, -7)
-            format = "Build"
+            displayName = filename:sub(1, -7) .. " (Build)"
 
+        -- .obj
         elseif filename:sub(-4) == ".obj" then
-            name = filename:sub(1, -5)
-            format = "obj"
+            displayName = filename:sub(1, -5) .. " (obj)"
 
+        -- .json
         elseif filename:sub(-5) == ".json" then
-            name = filename:sub(1, -6)
-            format = "json"
+            displayName = filename:sub(1, -6) .. " (json)"
         end
 
-        -- search filter (ONLY on filename)
-        if name then
-            if not search or name:lower():find(search, 1, true) then
-                table.insert(result, name .. " (" .. format .. ")")
+        -- apply search filter
+        if displayName then
+            if search == "" or displayName:lower():find(search, 1, true) then
+                table.insert(result, displayName)
             end
         end
     end
 
     return result
-end
-        task.wait()
-        list.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 5)
-    end
-
-    -- Hook live typing
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-        refresh(searchBox.Text)
-    end)
-
-    -- Initial load
-    refresh("")
 end
 local vu488 = 16777216
 local vu489 = 65536
