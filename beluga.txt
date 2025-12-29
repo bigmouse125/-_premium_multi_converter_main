@@ -2674,46 +2674,54 @@ function LoadFile(p665, p666, p667)
     LoadBlocks(v668, p667)
 end
 function PreviewFile(p672, p673, p674)
-    -- Convert and decode the build file
+    -- 1. Get the data (Handles legacy conversion or standard read)
     local v675 = Convert(p672) or readfile(p672)
     local v676 = Decode(v675, p673)
+    
+    -- 2. Identify the Plot/Zone
     local v677 = p674 and vu445[p674] or GetPlot()
-
-    -- Clear old preview
-    for _, child in ipairs(vu471(vu446)) do
-        vu472(child)
+    
+    -- Helper function to create the actual ghost block
+    -- This prevents repeating code for different formats
+    local function CreateGhost(blockName, data)
+        local blockTemplate = vu444[blockName]
+        if not blockTemplate then return end
+        
+        local ghost = vu473(blockTemplate) -- Clone template
+        vu468(ghost, v677.CFrame * data.Position * data.Rotation) -- Position it
+        
+        ghost.Health.Value = "" -- Disable health logic
+        ghost.Parent = vu446     -- Put in preview folder
+        
+        local pPart = ghost:FindFirstChild("PPart")
+        if pPart then
+            pPart.Size = data.Size or pPart.Size
+            pPart.Anchored = true
+            pPart.CanCollide = false -- Ensure ghosts don't block movement
+            pPart.Transparency = 0.5  -- Make it look like a "ghost"
+            
+            if data.Color then
+                -- Apply color to all parts of the block
+                for _, part in pairs(ghost:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Color = data.Color
+                    end
+                end
+            end
+        end
     end
 
-    -- Iterate through all blocks
-    local v678 = next
-    local v679 = nil
-    while true do
-        local v680
-        v679, v680 = v678(v676, v679)
-        if v679 == nil then break end
-
-        local v681 = next
-        local v682 = v679
-        local v683 = nil
-        while true do
-            local v684
-            v683, v684 = v681(v680, v683)
-            if v683 == nil then break end
-
-            -- Create a generic preview block
-            local v685 = Instance.new("Part")
-            v685.Anchored = true
-            v685.CanCollide = v684.CanCollide ~= nil and v684.CanCollide or true
-            v685.Size = v684.Size and vu454(Raw(v684.Size)) or vu454(2,2,2)
-            v685.CFrame = (v684.Rotation or CFrame.new()) * CFrame.new(v677.CFrame.Position + vu454(Raw(v684.Position)))
-            v685.Color = v684.Color and vu452(Raw(v684.Color)) or Color3.new(1,1,1)
-            v685.Transparency = v684.Transparency or 0
-            v685.Parent = vu446  -- BuildPreview
-
-            -- Optional: ShowShadow logic if needed
-            if v684.ShowShadow ~= nil then
-                -- implement shadow logic here
+    -- 3. Logic to handle DIFFERENT LAYOUTS
+    for key, value in pairs(v676) do
+        if type(key) == "string" and type(value) == "table" then
+            -- FORMAT A: Organized by Block Name (Your current script)
+            for _, blockData in pairs(value) do
+                CreateGhost(key, blockData)
             end
+        elseif type(value) == "table" and value.Name then
+            -- FORMAT B: Flat List (Common in other scripts)
+            -- Each entry is {Name = "Stone", Position = ...}
+            CreateGhost(value.Name, value)
         end
     end
 end
