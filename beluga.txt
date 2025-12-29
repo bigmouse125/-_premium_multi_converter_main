@@ -2123,33 +2123,33 @@ function ListBuilds(search)
     local files = listfiles("")
     local result = {}
 
-    -- normalize search (optional: empty search shows all)
-    search = search and search:lower() or ""
+    -- normalize search
+    search = (type(search) == "string" and search ~= "") and search:lower() or nil
 
     for _, filename in next, files do
-        local displayName = nil
+        local name, format
 
-        -- .build (lowercase)
         if filename:sub(-6) == ".build" then
-            displayName = filename:sub(1, -7) .. " (build)"
+            name = filename:sub(1, -7)
+            format = "build"
 
-        -- .Build (capital B)
         elseif filename:sub(-6) == ".Build" then
-            displayName = filename:sub(1, -7) .. " (Build)"
+            name = filename:sub(1, -7)
+            format = "Build"
 
-        -- .obj
         elseif filename:sub(-4) == ".obj" then
-            displayName = filename:sub(1, -5) .. " (obj)"
+            name = filename:sub(1, -5)
+            format = "obj"
 
-        -- .json
         elseif filename:sub(-5) == ".json" then
-            displayName = filename:sub(1, -6) .. " (json)"
+            name = filename:sub(1, -6)
+            format = "json"
         end
 
-        -- apply search filter
-        if displayName then
-            if search == "" or displayName:lower():find(search, 1, true) then
-                table.insert(result, displayName)
+        -- search filter (ONLY on filename)
+        if name then
+            if not search or name:lower():find(search, 1, true) then
+                table.insert(result, name .. " (" .. format .. ")")
             end
         end
     end
