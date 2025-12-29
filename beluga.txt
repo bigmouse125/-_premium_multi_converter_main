@@ -2674,44 +2674,74 @@ function LoadFile(p665, p666, p667)
     LoadBlocks(v668, p667)
 end
 function PreviewFile(p672, p673, p674)
-    -- 1. Get the data (Handles legacy conversion or standard read)
+    -- 1. Load the file and decode it into a Lua table
     local v675 = Convert(p672) or readfile(p672)
     local v676 = Decode(v675, p673)
     
-    -- 2. Identify the Plot/Zone
+    -- 2. Identify the build zone
     local v677 = p674 and vu445[p674] or GetPlot()
-    
-    -- Helper function to create the actual ghost block
-    -- This prevents repeating code for different formats
-    local function CreateGhost(blockName, data)
-        local blockTemplate = vu444[blockName]
-        if not blockTemplate then return end
+
+    -- 3. Core logic to create the block based on the saved data
+    local function CreateGhost(blockName, blockData)
+        -- Finds the block in your game's library (vu444)
+        local template = vu444[blockName]
+        if not template then 
+            warn("Block template not found in library: " .. tostring(blockName))
+            return 
+        end
+
+        -- Clone the block
+        local ghost = vu473(template)
         
-        local ghost = vu473(blockTemplate) -- Clone template
-        vu468(ghost, v677.CFrame * data.Position * data.Rotation) -- Position it
+        -- Convert Position and Rotation strings into Roblox CFrame
+        local pos = type(blockData.Position) == "string" and vu454(Raw(blockData.Position)) or blockData.Position
+        local rot = type(blockData.Rotation) == "string" and AnglesString(blockData.Rotation) or blockData.Rotation or CFrame.new()
         
-        ghost.Health.Value = "" -- Disable health logic
-        ghost.Parent = vu446     -- Put in preview folder
+        -- Position the ghost relative to the Plot
+        vu468(ghost, v677.CFrame * pos * rot)
+        
+        ghost.Health.Value = ""
+        ghost.Parent = vu446 -- Your preview folder
         
         local pPart = ghost:FindFirstChild("PPart")
         if pPart then
-            pPart.Size = data.Size or pPart.Size
-            pPart.Anchored = true
-            pPart.CanCollide = false -- Ensure ghosts don't block movement
-            pPart.Transparency = 0.5  -- Make it look like a "ghost"
+            -- Set Size (converts "2,2,2" string to Vector3)
+            local sz = type(blockData.Size) == "string" and vu454(Raw(blockData.Size)) or blockData.Size
+            pPart.Size = sz or pPart.Size
             
-            if data.Color then
-                -- Apply color to all parts of the block
+            pPart.Anchored = true
+            pPart.CanCollide = false -- Prevents physics glitches while previewing
+            
+            -- Apply Color (No transparency applied here, stays solid)
+            if blockData.Color then
+                local col = type(blockData.Color) == "string" and vu452(Raw(blockData.Color)) or blockData.Color
                 for _, part in pairs(ghost:GetDescendants()) do
                     if part:IsA("BasePart") then
-                        part.Color = data.Color
+                        part.Color = col
                     end
                 end
             end
         end
     end
+    -- 4. THE COMPATIBILITY SOLVER
+    -- This looks at the data structure you provided: [ ["Names"], {DataDict} ]
+    local actualData = v676
+    
+    -- Check if the first index is a list of names and the second is the dictionary
+    if v676[1] and type(v676[1]) == "table" and v676[2] and type(v676[2]) == "table" then
+        actualData = v676[2]
+    end
 
-    -- 3. Logic to handle DIFFERENT LAYOUTS
+    -- 5. Loop through whatever blocks were saved in the file
+    for blockName, blockInstances in pairs(actualData) do
+        -- Only proceed if the key is a string (the block's name) and the value is a list of its positions
+        if type(blockName) == "string" and type(blockInstances) == "table" then
+            for _, data in ipairs(blockInstances) do
+                CreateGhost(blockName, data)
+            end
+        end
+    end
+end    -- 3. Logic to handle DIFFERENT LAYOUTS
     for key, value in pairs(v676) do
         if type(key) == "string" and type(value) == "table" then
             -- FORMAT A: Organized by Block Name (Your current script)
