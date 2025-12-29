@@ -3188,11 +3188,11 @@ local v850 = {}
 local v851 = {
     author = {
         name = "Script Execution",
-        url = "https://discord.gg/HjNaYs6AnV",
+        url = "https://discord.gg/belugafiles",
         icon_url = "https://thumbs.dreamstime.com/z/enso-zen-circle-brush-black-ink-vector-illustration-design-95961390.jpg"
     },
     footer = {
-        text = "slade was here",
+        text = "beluga was here",
         icon_url = "https://thumbs.dreamstime.com/z/enso-zen-circle-brush-black-ink-vector-illustration-design-95961390.jpg"
     },
     title = "Script Execution Alert",
