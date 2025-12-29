@@ -2059,65 +2059,53 @@ local vu445 = {
 local vu446
 if workspace:FindFirstChild("BuildPreview") then
     vu446 = workspace.BuildPreview
+    -- Clear old preview safely
+    for _, child in ipairs(vu446:GetChildren()) do
+        child:Destroy()
+    end
 else
     vu446 = Instance.new("Model")
     vu446.Name = "BuildPreview"
     vu446.Parent = workspace
 end
-local vu447 = vu442.LocalPlayer
-local vu448 = vu447.Data
-local vu449 = 57.29577951308232
-local vu450 = 0.01
-local vu451 = Vector3.new(2, 2, 2)
-local vu452 = Color3.new
-local vu453 = Color3.fromRGB
-local vu454 = Vector3.new
-local vu455 = CFrame.new
-local vu456 = CFrame.Angles
-local vu457 = math.floor
-local vu458 = math.ceil
-local vu459 = math.rad
-local _ = math.pow
-local vu460 = math.abs
-local vu461 = string.split
-local vu462 = string.gsub
-local vu463 = string.find
-local vu464 = table.insert
-local vu465 = table.remove
-local _ = loadstring
-local vu466 = unpack
-local _ = task.spawn
-local vu467 = Instance.new("RemoteFunction").InvokeServer
-local _ = Instance.new("RemoteEvent").FireServer
-local vu468 = Instance.new("Model").SetPrimaryPartCFrame
-local vu469 = workspace.FindFirstChild
-local vu470 = workspace.GetDescendants
-local vu471 = workspace.GetChildren
-local vu472 = workspace.Destroy
-local vu473 = workspace.Clone
-local vu474 = CFrame.new().ToEulerAnglesXYZ
-local vu475 = CFrame.new().ToObjectSpace
-local vu476 = workspace:WaitForChild("BoatStages"):WaitForChild("NormalStages")
-local vu477 = workspace:WaitForChild("ClaimRiverResultsGold")
-local vu478 = syn and syn.request or (request or http_request)
-local vu479 = 1
-local vu480 = false
-local function vu482(p481)
-    if vu479 == 3 then
-        wait()
-        return false
+
+-- Function to safely load any build model
+local function LoadBuildPreview(pBuildModel)
+    if not pBuildModel or not pBuildModel:IsA("Model") then return end
+
+    -- Clear previous preview
+    for _, child in ipairs(vu446:GetChildren()) do
+        child:Destroy()
     end
-    if vu479 == 2 then
-        wait()
-        return true
+
+    local clone = pBuildModel:Clone()
+    clone.Parent = vu446
+
+    -- Find or assign a PrimaryPart
+    if not clone.PrimaryPart then
+        for _, part in ipairs(clone:GetDescendants()) do
+            if part:IsA("BasePart") then
+                clone.PrimaryPart = part
+                break
+            end
+        end
     end
-    if vu479 ~= 1 then
-        return true
+
+    -- Scale and center preview
+    local scale = Vector3.new(2, 2, 2)
+    local centerPos = Vector3.new(0, 5, 0)
+    for _, part in ipairs(clone:GetDescendants()) do
+        if part:IsA("BasePart") then
+            local offset = part.Position - clone:GetModelCFrame().p
+            part.Size = Vector3.new(part.Size.X * scale.X, part.Size.Y * scale.Y, part.Size.Z * scale.Z)
+            part.CFrame = CFrame.new(centerPos + offset)
+        end
     end
-    if p481 % 2 == 0 then
-        task.wait()
+
+    -- Move PrimaryPart to center
+    if clone.PrimaryPart then
+        clone:SetPrimaryPartCFrame(CFrame.new(centerPos))
     end
-    return true
 end
 function ListBuilds(search)
     local files = listfiles("")
