@@ -2119,12 +2119,12 @@ local function vu482(p481)
     end
     return true
 end
-function ListBuilds(search)
+function ListBuilds(searchText)
     local files = listfiles("")
     local result = {}
 
     -- normalize search
-    search = (type(search) == "string" and search ~= "") and search:lower() or nil
+    searchText = (type(searchText) == "string" and searchText ~= "") and searchText:lower() or nil
 
     for _, filename in next, files do
         local name, format
@@ -2146,11 +2146,8 @@ function ListBuilds(search)
             format = "json"
         end
 
-        -- search filter (ONLY on filename)
-        if name then
-            if not search or name:lower():find(search, 1, true) then
-                table.insert(result, name .. " (" .. format .. ")")
-            end
+        if name and (not searchText or name:lower():find(searchText, 1, true)) then
+            table.insert(result, name .. " (" .. format .. ")")
         end
     end
 
