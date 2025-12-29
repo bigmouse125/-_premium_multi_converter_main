@@ -2674,45 +2674,52 @@ function LoadFile(p665, p666, p667)
     LoadBlocks(v668, p667)
 end
 function PreviewFile(p672, p673, p674)
-    -- 1. Load the file and decode it into a Lua table
     local v675 = Convert(p672) or readfile(p672)
     local v676 = Decode(v675, p673)
-    
-    -- 2. Identify the build zone
     local v677 = p674 and vu445[p674] or GetPlot()
 
-    -- 3. Core logic to create the block based on the saved data
     local function CreateGhost(blockName, blockData)
-        -- Finds the block in your game's library (vu444)
         local template = vu444[blockName]
-        if not template then 
-            warn("Block template not found in library: " .. tostring(blockName))
-            return 
-        end
+        if not template then return end
 
-        -- Clone the block
         local ghost = vu473(template)
         
-        -- Convert Position and Rotation strings into Roblox CFrame
-        local pos = type(blockData.Position) == "string" and vu454(Raw(blockData.Position)) or blockData.Position
-        local rot = type(blockData.Rotation) == "string" and AnglesString(blockData.Rotation) or blockData.Rotation or CFrame.new()
+        -- Safe Position Handling
+        local pos = Vector3.new(0, 0, 0)
+        if blockData.Position then
+            pos = type(blockData.Position) == "string" and vu454(Raw(blockData.Position)) or blockData.Position
+        end
         
-        -- Position the ghost relative to the Plot
+        -- Safe Rotation Handling (Fixes the 'index nil with Y' error)
+        local rot = CFrame.new()
+        if blockData.Rotation then
+            -- Wrap in pcall to prevent the 'Y' index error from crashing the script
+            local success, result = pcall(function()
+                return type(blockData.Rotation) == "string" and AnglesString(blockData.Rotation) or blockData.Rotation
+            end)
+            if success and result then
+                rot = result
+            end
+        end
+        
+        -- Apply the CFrame
         vu468(ghost, v677.CFrame * pos * rot)
         
         ghost.Health.Value = ""
-        ghost.Parent = vu446 -- Your preview folder
+        ghost.Parent = vu446
         
         local pPart = ghost:FindFirstChild("PPart")
         if pPart then
-            -- Set Size (converts "2,2,2" string to Vector3)
-            local sz = type(blockData.Size) == "string" and vu454(Raw(blockData.Size)) or blockData.Size
-            pPart.Size = sz or pPart.Size
+            -- Safe Size Handling
+            if blockData.Size then
+                local sz = type(blockData.Size) == "string" and vu454(Raw(blockData.Size)) or blockData.Size
+                pPart.Size = sz or pPart.Size
+            end
             
             pPart.Anchored = true
-            pPart.CanCollide = false -- Prevents physics glitches while previewing
+            pPart.CanCollide = false
             
-            -- Apply Color (No transparency applied here, stays solid)
+            -- Apply Color
             if blockData.Color then
                 local col = type(blockData.Color) == "string" and vu452(Raw(blockData.Color)) or blockData.Color
                 for _, part in pairs(ghost:GetDescendants()) do
@@ -2724,18 +2731,13 @@ function PreviewFile(p672, p673, p674)
         end
     end
 
-    -- 4. THE COMPATIBILITY SOLVER
-    -- This looks at the data structure you provided: [ ["Names"], {DataDict} ]
+    -- Logic to handle the specific nested format
     local actualData = v676
-    
-    -- Check if the first index is a list of names and the second is the dictionary
     if v676[1] and type(v676[1]) == "table" and v676[2] and type(v676[2]) == "table" then
         actualData = v676[2]
     end
 
-    -- 5. Loop through whatever blocks were saved in the file
     for blockName, blockInstances in pairs(actualData) do
-        -- Only proceed if the key is a string (the block's name) and the value is a list of its positions
         if type(blockName) == "string" and type(blockInstances) == "table" then
             for _, data in ipairs(blockInstances) do
                 CreateGhost(blockName, data)
