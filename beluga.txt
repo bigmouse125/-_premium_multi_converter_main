@@ -2127,19 +2127,31 @@ function ListBuilds()
     for _, filename in next, files do
         -- .build (lowercase)
         if filename:sub(-6) == ".build" then
-            table.insert(result, filename:sub(1, -7) .. " (build)")
+            table.insert(result, {
+                name = filename:sub(1, -7),
+                format = "build"
+            })
 
         -- .Build (capital B)
         elseif filename:sub(-6) == ".Build" then
-            table.insert(result, filename:sub(1, -7) .. " (Build)")
+            table.insert(result, {
+                name = filename:sub(1, -7),
+                format = "Build"
+            })
 
         -- .obj
         elseif filename:sub(-4) == ".obj" then
-            table.insert(result, filename:sub(1, -5) .. " (obj)")
+            table.insert(result, {
+                name = filename:sub(1, -5),
+                format = "obj"
+            })
 
         -- .json
         elseif filename:sub(-5) == ".json" then
-            table.insert(result, filename:sub(1, -6) .. " (json)")
+            table.insert(result, {
+                name = filename:sub(1, -6),
+                format = "json"
+            })
         end
     end
 
